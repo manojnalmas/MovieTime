@@ -16,7 +16,6 @@ SECRET_KEY = os.getenv(
 
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
 
-# Comma-separated hosts in the environment, e.g. localhost,127.0.0.1
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.getenv(
@@ -43,6 +42,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -70,7 +70,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-# Database: MySQL
+# Database: Aiven MySQL
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
@@ -81,6 +81,7 @@ DATABASES = {
         "PORT": os.getenv("DB_PORT", "3306"),
         "OPTIONS": {
             "charset": "utf8mb4",
+            "ssl": {},
         },
     }
 }
@@ -118,6 +119,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": (
             "django.contrib.auth.password_validation."
+            "CommonPasswordValidator"
+        ),
+    },
+    {
+        "NAME": (
+            "django.contrib.auth.password_validation."
             "NumericPasswordValidator"
         ),
     },
@@ -135,5 +142,5 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Email (development console backend)
+# Email
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
