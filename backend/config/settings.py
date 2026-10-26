@@ -95,7 +95,7 @@ CORS_ALLOWED_ORIGINS = [
     ).split(",")
     if origin.strip()
 ]
-
+CORS_ALLOW_CREDENTIALS = True
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {

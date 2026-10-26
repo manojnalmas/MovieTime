@@ -394,66 +394,30 @@ function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  // LOAD MOVIES, SHOWS AND LOGIN SESSION
+  // LOAD MOVIES AND SHOWS
   useEffect(() => {
     let active = true;
 
     async function loadInitialData() {
       try {
-        const [movieResponse, showResponse, userResponse] =
-          await Promise.all([
-            fetch(API_URL),
-            fetch(SHOWS_URL),
-            fetch(CURRENT_USER_URL, {
-              credentials: "include",
-            }),
-          ]);
+        const [movieResponse, showResponse] = await Promise.all([
+          fetch(API_URL),
+          fetch(SHOWS_URL),
+        ]);
 
         if (!movieResponse.ok || !showResponse.ok) {
           throw new Error("Movies or shows API failed");
         }
 
-        const [movieData, showData, userData] = await Promise.all([
+        const [movieData, showData] = await Promise.all([
           movieResponse.json(),
           showResponse.json(),
-          userResponse.json(),
         ]);
 
         if (!active) return;
 
         setMovies(Array.isArray(movieData) ? movieData : []);
         setShows(Array.isArray(showData) ? showData : []);
-
-        const username =
-          userResponse.ok && userData.authenticated
-            ? userData.username
-            : "";
-
-        setLoggedInUsername(username);
-
-        if (username) {
-          try {
-            const bookingResponse = await fetch(BOOKINGS_URL, {
-              credentials: "include",
-            });
-
-            if (bookingResponse.ok) {
-              const bookingData = await bookingResponse.json();
-
-              if (active) {
-                setBookings(
-                  Array.isArray(bookingData) ? bookingData : []
-                );
-              }
-            } else if (bookingResponse.status === 401 && active) {
-              setBookings([]);
-            }
-          } catch (bookingError) {
-            console.error("Bookings loading error:", bookingError);
-          }
-        } else if (active) {
-          setBookings([]);
-        }
       } catch (error) {
         console.error("Initial loading error:", error);
 
@@ -469,6 +433,51 @@ function App() {
       }
     }
 
+    async function loadUserData() {
+      let username = "";
+
+      try {
+        const userResponse = await fetch(CURRENT_USER_URL, {
+          credentials: "include",
+        });
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          username = userData.authenticated ? userData.username : "";
+        }
+      } catch (error) {
+        console.error("Current user loading error:", error);
+      }
+
+      if (!active) return;
+
+      setLoggedInUsername(username);
+
+      if (!username) {
+        setBookings([]);
+        return;
+      }
+
+      try {
+        const bookingResponse = await fetch(BOOKINGS_URL, {
+          credentials: "include",
+        });
+
+        if (bookingResponse.ok) {
+          const bookingData = await bookingResponse.json();
+
+          if (active) {
+            setBookings(Array.isArray(bookingData) ? bookingData : []);
+          }
+        } else if (bookingResponse.status === 401 && active) {
+          setBookings([]);
+        }
+      } catch (error) {
+        console.error("Bookings loading error:", error);
+      }
+    }
+
+    loadUserData();
     loadInitialData();
 
     return () => {
