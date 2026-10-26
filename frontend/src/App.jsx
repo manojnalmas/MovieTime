@@ -400,24 +400,54 @@ function App() {
 
     async function loadInitialData() {
       try {
-        const [movieResponse, showResponse] = await Promise.all([
-          fetch(API_URL),
-          fetch(SHOWS_URL),
-        ]);
+        const [movieResult, showResult] = await Promise.allSettled([
+          fetch(API_URL).then(async (response) => {
+            if (!response.ok) {
+              throw new Error("Movies API failed");
+            }
 
-        if (!movieResponse.ok || !showResponse.ok) {
-          throw new Error("Movies or shows API failed");
-        }
+            return response.json();
+          }),
+          fetch(SHOWS_URL).then(async (response) => {
+            if (!response.ok) {
+              throw new Error("Shows API failed");
+            }
 
-        const [movieData, showData] = await Promise.all([
-          movieResponse.json(),
-          showResponse.json(),
+            return response.json();
+          }),
         ]);
 
         if (!active) return;
 
-        setMovies(Array.isArray(movieData) ? movieData : []);
-        setShows(Array.isArray(showData) ? showData : []);
+        if (
+          movieResult.status === "fulfilled" &&
+          Array.isArray(movieResult.value)
+        ) {
+          setMovies(movieResult.value);
+        } else {
+          console.error(
+            "Movie loading error:",
+            movieResult.status === "rejected"
+              ? movieResult.reason
+              : new Error("Movies response was invalid")
+          );
+          setError("Could not load movies. Check the Django server.");
+        }
+
+        if (
+          showResult.status === "fulfilled" &&
+          Array.isArray(showResult.value)
+        ) {
+          setShows(showResult.value);
+        } else {
+          console.error(
+            "Shows loading error:",
+            showResult.status === "rejected"
+              ? showResult.reason
+              : new Error("Shows response was invalid")
+          );
+          setShows([]);
+        }
       } catch (error) {
         console.error("Initial loading error:", error);
 
@@ -1503,7 +1533,9 @@ function App() {
                 </div>
 
                 <span className="movie-count">
-                  {filteredMovies.length} movies
+                  {loading
+                    ? "Loading..."
+                    : `${filteredMovies.length} movies`}
                 </span>
               </div>
 
