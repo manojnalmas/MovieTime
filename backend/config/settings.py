@@ -16,6 +16,9 @@ SECRET_KEY = os.getenv(
 
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
 
+SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SECURE = not DEBUG
+
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.getenv(
