@@ -2,16 +2,16 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
 
-const API_URL = "/api/movies/";
-const SHOWS_URL = "/api/shows/";
-const BOOKING_URL = "/api/bookings/create/";
-const BOOKINGS_URL = "/api/bookings/";
-const BOOKED_SEATS_URL = "/api/booked-seats/";
-const REGISTER_URL = "/api/register/";
-const LOGIN_URL = "/api/login/";
-const CURRENT_USER_URL = "/api/me/";
-const LOGOUT_URL = "/api/logout/";
-const ADMIN_DASHBOARD_URL = "/api/admin-dashboard/";
+const API_URL = "https://movietime-9w98.onrender.com/api/movies/";
+const SHOWS_URL = "https://movietime-9w98.onrender.com/api/shows/";
+const BOOKING_URL = "https://movietime-9w98.onrender.com/api/bookings/create/";
+const BOOKINGS_URL = "https://movietime-9w98.onrender.com/api/bookings/";
+const BOOKED_SEATS_URL = "https://movietime-9w98.onrender.com/api/booked-seats/";
+const REGISTER_URL = "https://movietime-9w98.onrender.com/api/register/";
+const LOGIN_URL = "https://movietime-9w98.onrender.com/api/login/";
+const CURRENT_USER_URL = "https://movietime-9w98.onrender.com/api/me/";
+const LOGOUT_URL = "https://movietime-9w98.onrender.com/api/logout/";
+const ADMIN_DASHBOARD_URL = "https://movietime-9w98.onrender.com/api/admin-dashboard/";
 
 function App() {
   const [movies, setMovies] = useState([]);
